@@ -3,37 +3,33 @@ const input = document.querySelector("#cash");
 const changeDue = document.querySelector("#change-due"); // serf.
 const priceDiv = document.querySelector("#price");
 
-let price = 3.26;
+let price = 19.5;
 //cid = cash-in-drawer;
 let cid = [
-    {"pennies": 0.87},
-    {"nickels": 2},
-    {"dimes": 2.7},
-    {"quarters": 3.25},
-    {"ones": 88},
-    {"fives": 55},
-    {"tens": 20},
-    {"twenties": 60},
-    {"hundreds": 100}
+    {name: "PENNY", value: 0.01, amount: 0.87, change: 0},
+    {name: "NICKEL", value: 0.05, amount: 2, change: 0},
+    {name: "DIME", value: 0.1, amount: 2.7, change: 0},
+    {name: "QUARTER", value: 0.25, amount: 3.25, change: 0},
+    {name: "ONE", value: 1, amount: 88, change: 0},
+    {name: "FIVE", value: 5, amount: 55, change: 0},
+    {name: "TEN", value: 10, amount: 20, change: 0},
+    {name: "TWENTY", value: 20, amount: 60, change: 0},
+    {name: "ONE HUNDRED", value: 100, amount: 100, change: 0}
 ]
 
-// console.log(Object.keys(cid[0])[0]);
+let totalAmount = 0;
 
-// Pennies(1cent): $0.87
-// Nickels(5cents): $2
-// Dimes(10cents): $2.7
-// Quarters(25cents): $3.25
-// Ones(100 cents): $88
-// Fives(500cents): $55
-// Tens(1000cents): $20
-// Twenties(2000cents): $60
-// Hundreds(10000): $100
+cid.forEach(el => {
+    totalAmount += el.amount;
+})
+
+console.log(totalAmount);
+
+
 
 priceDiv.innerHTML = `<span style="font-weight: bold">Total:</span> ${price}`;
 
-let resultsArr = [];
 let holder = 0;
-let j = 0;
 
 const mainFunction = ()=> {
     changeDue.innerHTML = "";
@@ -47,19 +43,37 @@ const mainFunction = ()=> {
     }
     if (parseFloat(input.value) > price) {
         //handle the change due (serf);
-        let result = parseFloat(input.value) - price;
+        let theRest = parseFloat(input.value) - price;
+        if (totalAmount < theRest) {
+            changeDue.innerHTML = `Status: INSUFFICIENT_FUNDS`;
+            return 0;
+        }
+        else if (totalAmount === theRest) {
+            changeDue.innerHTML = `Status: CLOSED`;
+            return 0;
+        }
         for (let i = (cid.length - 1); i >= 0; i--) {
             holder = 0;
-            let key = Object.keys(cid[i])[0];
-            while (result > cid[i][key]) {
-                result -= cid[i][key];
-                holder += cid[i][key];
+            while (theRest >= cid[i].value) {
+                theRest -= cid[i].value;
+                theRest = parseFloat(theRest.toFixed(2));
+                holder += cid[i].value;
             }
-            resultsArr[j] = holder;
-            j++;
+            cid[i].change = holder;
         }
-        console.log(resultsArr);
-        console.log(result);
+        console.log(cid);
+        const status = document.createElement("div");
+        status.classList.add("status");
+        status.innerHTML = "Status: OPEN";
+        changeDue.append(status);
+        cid.slice().reverse().forEach(element => {
+            if (element.change > 0) {
+                const unitChange = document.createElement("div");
+                unitChange.classList.add("unit");
+                unitChange.innerHTML += `${element.name}: $${element.change} `;
+                changeDue.append(unitChange);
+            }
+        });
     }
 }
 
