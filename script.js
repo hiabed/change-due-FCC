@@ -2,6 +2,7 @@ const purchaseBtn = document.querySelector("#purchase-btn");
 const input = document.querySelector("#cash");
 const changeDue = document.querySelector("#change-due"); // serf.
 const priceDiv = document.querySelector("#price");
+const restCid = document.querySelector("#rest-cid");
 
 let price = 19.5;
 //cid = cash-in-drawer;
@@ -17,9 +18,16 @@ let cid = [
     {name: "ONE HUNDRED", value: 100, amount: 100, change: 0}
 ]
 
-let totalAmount = 0;
+let fontNames = ["Pennies", "Nickels", "Dimes", "Quarters", "Ones", "Fives", "Tens", "Twenties", "Hundreds"];
 
+let totalAmount = 0;
+let j = 0;
 cid.forEach(el => {
+    const denomination = document.createElement("p");
+    denomination.classList.add("denom");
+    denomination.innerHTML = `${fontNames[j]}: ${el.amount}`
+    j++;
+    restCid.append(denomination);
     totalAmount += el.amount;
 })
 
@@ -54,10 +62,11 @@ const mainFunction = ()=> {
         }
         for (let i = (cid.length - 1); i >= 0; i--) {
             holder = 0;
-            while (theRest >= cid[i].value) {
+            while (theRest >= cid[i].value && cid[i].amount > 0) {
                 theRest -= cid[i].value;
                 theRest = parseFloat(theRest.toFixed(2));
                 holder += cid[i].value;
+                cid[i].amount -= cid[i].value;
             }
             cid[i].change = holder;
         }
@@ -74,6 +83,12 @@ const mainFunction = ()=> {
                 changeDue.append(unitChange);
             }
         });
+        const arr = document.querySelectorAll(".denom");
+        let j = 0;
+        arr.forEach(el => {
+            el.innerHTML = `${fontNames[j]}: ${cid[j].amount}`
+            j++;
+        })
     }
 }
 
